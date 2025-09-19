@@ -1,0 +1,77 @@
+[
+  {
+    "id": "bmw-m1000",
+    "name": "BMW M1000",
+    "folder": "moto/bmw-m1000",
+    "images": ["back.jpg","face.jpg","front.jpg","panel.jpg","side.jpg"],
+    "price": "$28,500",
+    "desc": "High-performance motorcycle from BMW.",
+    "specs": {
+      "engine": "Petrol",
+      "power": "205 hp",
+      "seats": 2,
+      "transmission": "Manual",
+      "mileage": "1,200 km"
+    }
+  },
+  {
+    "id": "bmw-r",
+    "name": "BMW R",
+    "folder": "moto/bmw-r",
+    "images": ["close.jpg","front.jpg","side.jpg","wheel.jpg"],
+    "price": "$15,900",
+    "desc": "Reliable ride with timeless styling.",
+    "specs": {
+      "engine": "Petrol",
+      "power": "95 hp",
+      "seats": 2,
+      "transmission": "Manual",
+      "mileage": "8,700 km"
+    }
+  },
+  {
+    "id": "diavel",
+    "name": "Diavel",
+    "folder": "moto/diavel",
+    "images": ["back.jpg","face.jpg","front.jpg"],
+    "price": "$22,000",
+    "desc": "Muscular cruiser with modern tech.",
+    "specs": {
+      "engine": "Petrol",
+      "power": "160 hp",
+      "seats": 2,
+      "transmission": "Manual",
+      "mileage": "4,500 km"
+    }
+  },
+  {
+    "id": "diavel-bantley",
+    "name": "Diavel Bantley",
+    "folder": "moto/diavel-bantley",
+    "images": ["back.webp","backwheel.webp","front.webp","panel.webp","side A.webp","side B.webp","wheel.webp"],
+    "price": "$34,900",
+    "desc": "Limited edition with premium finishes.",
+    "specs": {
+      "engine": "Petrol",
+      "power": "180 hp",
+      "seats": 2,
+      "transmission": "Automatic",
+      "mileage": "600 km"
+    }
+  },
+  {
+    "id": "diavel-lamborgini",
+    "name": "Diavel Lamborghini",
+    "folder": "moto/diavel-lamborgini",
+    "images": ["back.webp","close.webp","face.webp","face2.webp","panel.webp","wheel.webp"],
+    "price": "$39,500",
+    "desc": "Exotic collaboration model.",
+    "specs": {
+      "engine": "Petrol",
+      "power": "214 hp",
+      "seats": 2,
+      "transmission": "Automatic",
+      "mileage": "300 km"
+    }
+  }
+]
