@@ -1,0 +1,9 @@
+{
+  "name": "prestigemotors-site",
+  "version": "1.0.0",
+  "description": "Static demo site for Prestige Motors",
+  "scripts": {
+    "add-model": "node scripts/add-model.js"
+  },
+  "license": "MIT"
+}
