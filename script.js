@@ -1,378 +1,413 @@
-// Accessible mobile nav toggle
-document.addEventListener('DOMContentLoaded', function () {
-  // Car grid switching logic for showcase
-  const navBtns = document.querySelectorAll('.slider-nav-btn');
-  const carGrids = document.querySelectorAll('.car-grid');
-  // Helper: activate a category with a small fade transition
-  function activateCategory(cat) {
-    const target = document.querySelector(`.car-grid[data-category="${cat}"]`);
-    if (!target) return;
-    // remove active from others with a short fade
-    carGrids.forEach(grid => {
-      if (grid === target) return;
-      if (grid.classList.contains('active')) {
-        grid.classList.remove('active');
-        grid.classList.add('fade-out');
-        // remove fade-out after transition
-        setTimeout(() => grid.classList.remove('fade-out'), 300);
-      }
-    });
-    // activate target
-    target.classList.add('active');
-    // update buttons
-    navBtns.forEach(b => b.classList.toggle('active', b.getAttribute('data-category') === cat));
-    // update URL (shallow) so users can copy link
-    try {
-      const url = new URL(window.location);
-      url.searchParams.set('category', cat);
-      window.history.replaceState({}, '', url);
-    } catch (e) {
-      // ignore if URL manipulation isn't allowed
-    }
-    // focus the first focusable element in the grid for keyboard users
-    const focusable = target.querySelector('a, button, [tabindex]:not([tabindex="-1"])');
-    if (focusable) focusable.focus({preventScroll:true});
-  }
-
-  navBtns.forEach(btn => {
-    btn.addEventListener('click', () => {
-      const cat = btn.getAttribute('data-category');
-      activateCategory(cat);
-    });
-  });
-  // Determine initial category: from URL (?category=) or hash, or default to sport
-  function getInitialCategory() {
-    const params = new URLSearchParams(window.location.search);
-    if (params.has('category')) return params.get('category');
-    if (window.location.hash) return window.location.hash.replace('#', '');
-    return 'sport';
-  }
-
-  const initial = getInitialCategory();
-  // If initial category doesn't exist, fallback to first available button
-  const availableCats = Array.from(navBtns).map(b => b.getAttribute('data-category'));
-  const startCat = availableCats.includes(initial) ? initial : (availableCats[0] || 'sport');
-  activateCategory(startCat);
-  const btn = document.querySelector('.nav-toggle');
-  const nav = document.getElementById('primary-navigation');
-  if (!btn || !nav) return;
-
-  btn.addEventListener('click', function (e) {
-    e.stopPropagation();
-    const isOpen = btn.getAttribute('aria-expanded') === 'true';
-    btn.setAttribute('aria-expanded', String(!isOpen));
-    btn.setAttribute('aria-label', isOpen ? 'Open main menu' : 'Close main menu');
-    nav.dataset.open = String(!isOpen);
-  });
-
-  // Smooth scroll from hero Browse Inventory button to moto grid with header offset
-  const browseBtn = document.querySelector('.hero .btn[href^="#moto-grid"]');
-  if (browseBtn) {
-    browseBtn.addEventListener('click', (ev) => {
-      // let native anchor behavior be suppressed so we can offset for sticky header
-      ev.preventDefault();
-      const target = document.querySelector('#moto-grid');
-      if (!target) return;
-      const headerEl = document.querySelector('header');
-      const headerHeight = headerEl ? headerEl.getBoundingClientRect().height : 0;
-      const top = target.getBoundingClientRect().top + window.pageYOffset - headerHeight - 12; // small gap
-      window.scrollTo({ top, behavior: 'smooth' });
-    });
-  }
-
-  // Prevent clicks inside nav from bubbling to document click
-  nav.addEventListener('click', (e) => e.stopPropagation());
-
-  // Close menu when clicking outside
-  document.addEventListener('click', (e) => {
-    if (nav.dataset.open === 'true') {
-      btn.setAttribute('aria-expanded', 'false');
-      btn.setAttribute('aria-label', 'Open main menu');
-      nav.dataset.open = 'false';
-    }
-  });
-
-  // Close on Escape
-  document.addEventListener('keydown', (e) => {
-    if (e.key === 'Escape' && nav.dataset.open === 'true') {
-      btn.setAttribute('aria-expanded', 'false');
-      btn.setAttribute('aria-label', 'Open main menu');
-      nav.dataset.open = 'false';
-      btn.focus();
-    }
-  });
-});
-
-/* --- Moto gallery rendering --- */
 (() => {
-  // fallback models (used if data/models.json is not available)
   const fallbackModels = [
     {
-      id: 'bmw-m1000',
-      name: 'BMW M1000',
-      folder: 'moto/bmw-m1000',
-      images: ['back.jpg','face.jpg','front.jpg','panel.jpg','side.jpg'],
-      price: '$28,500',
-      desc: 'High-performance motorcycle from BMW.',
+      id: "bmw-m1000",
+      name: "BMW M1000",
+      folder: "moto/bmw-m1000",
+      images: ["back.jpg", "face.jpg", "front.jpg", "panel.jpg", "side.jpg"],
+      price: "$28,500",
+      desc: "Высокопроизводительный спортбайк с трековым характером.",
       specs: {
-        engine: 'Petrol',
-        power: '205 hp',
+        engine: "Бензин",
+        power: "205 л.с.",
         seats: 2,
-        transmission: 'Manual',
-        mileage: '1,200 km'
+        transmission: "Механика",
+        mileage: "1 200 км"
       }
     },
     {
-      id: 'bmw-r',
-      name: 'BMW R',
-      folder: 'moto/bmw-r',
-      images: ['close.jpg','front.jpg','side.jpg','wheel.jpg'],
-      price: '$15,900',
-      desc: 'Reliable ride with timeless styling.',
+      id: "bmw-r",
+      name: "BMW R",
+      folder: "moto/bmw-r",
+      images: ["close.jpg", "front.jpg", "side.jpg", "wheel.jpg"],
+      price: "$15,900",
+      desc: "Надежная модель с классическим силуэтом и комфортной посадкой.",
       specs: {
-        engine: 'Petrol',
-        power: '95 hp',
+        engine: "Бензин",
+        power: "95 л.с.",
         seats: 2,
-        transmission: 'Manual',
-        mileage: '8,700 km'
+        transmission: "Механика",
+        mileage: "8 700 км"
       }
     },
     {
-      id: 'diavel',
-      name: 'Diavel',
-      folder: 'moto/diavel',
-      images: ['back.jpg','face.jpg','front.jpg'],
-      price: '$22,000',
-      desc: 'Muscular cruiser with modern tech.',
+      id: "diavel",
+      name: "Diavel",
+      folder: "moto/diavel",
+      images: ["back.jpg", "face.jpg", "front.jpg"],
+      price: "$22,000",
+      desc: "Мощный круизер с агрессивной посадкой и современной электроникой.",
       specs: {
-        engine: 'Petrol',
-        power: '160 hp',
+        engine: "Бензин",
+        power: "160 л.с.",
         seats: 2,
-        transmission: 'Manual',
-        mileage: '4,500 km'
+        transmission: "Механика",
+        mileage: "4 500 км"
       }
     },
     {
-      id: 'diavel-bantley',
-      name: 'Diavel Bantley',
-      folder: 'moto/diavel-bantley',
-      images: ['back.webp','backwheel.webp','front.webp','panel.webp','side A.webp','side B.webp','wheel.webp'],
-      price: '$34,900',
-      desc: 'Limited edition with premium finishes.',
+      id: "diavel-bantley",
+      name: "Diavel Bantley",
+      folder: "moto/diavel-bantley",
+      images: ["back.webp", "backwheel.webp", "front.webp", "panel.webp", "side A.webp", "side B.webp", "wheel.webp"],
+      price: "$34,900",
+      desc: "Лимитированная версия с эксклюзивной отделкой и деталями.",
       specs: {
-        engine: 'Petrol',
-        power: '180 hp',
+        engine: "Бензин",
+        power: "180 л.с.",
         seats: 2,
-        transmission: 'Automatic',
-        mileage: '600 km'
+        transmission: "Автомат",
+        mileage: "600 км"
       }
     },
     {
-      id: 'diavel-lamborgini',
-      name: 'Diavel Lamborghini',
-      folder: 'moto/diavel-lamborgini',
-      images: ['back.webp','close.webp','face.webp','face2.webp','panel.webp','wheel.webp'],
-      price: '$39,500',
-      desc: 'Exotic collaboration model.',
+      id: "diavel-lamborgini",
+      name: "Diavel Lamborghini",
+      folder: "moto/diavel-lamborgini",
+      images: ["back.webp", "close.webp", "face.webp", "face2.webp", "panel.webp", "wheel.webp"],
+      price: "$39,500",
+      desc: "Экзотическая коллаборация с акцентом на динамику и дизайн.",
       specs: {
-        engine: 'Petrol',
-        power: '214 hp',
+        engine: "Бензин",
+        power: "214 л.с.",
         seats: 2,
-        transmission: 'Automatic',
-        mileage: '300 km'
+        transmission: "Автомат",
+        mileage: "300 км"
       }
     }
   ];
 
-  const grid = document.getElementById('moto-grid');
-  const modal = document.getElementById('gallery-modal');
-  const modalImage = document.getElementById('modal-image');
-  const modalName = document.getElementById('modal-name');
-  const modalDesc = document.getElementById('modal-desc');
-  const modalPrice = document.getElementById('modal-price');
-  const closeBtn = document.querySelector('.modal-close');
-  const prevBtn = document.querySelector('.modal-prev');
-  const nextBtn = document.querySelector('.modal-next');
+  const ui = {
+    menuToggle: document.querySelector(".menu-toggle"),
+    menuClose: document.querySelector(".menu-close"),
+    menuOverlay: document.getElementById("menu-overlay"),
+    overlayLinks: document.querySelectorAll(".overlay-nav a"),
+    searchInput: document.getElementById("search-input"),
+    sortSelect: document.getElementById("sort-select"),
+    grid: document.getElementById("moto-grid"),
+    resultCount: document.getElementById("result-count"),
+    emptyState: document.getElementById("empty-state"),
+    modal: document.getElementById("gallery-modal"),
+    modalImage: document.getElementById("modal-image"),
+    modalName: document.getElementById("modal-name"),
+    modalDesc: document.getElementById("modal-desc"),
+    modalPrice: document.getElementById("modal-price"),
+    modalInfo: document.getElementById("modal-info"),
+    modalShowMore: document.getElementById("modal-show-more"),
+    closeBtn: document.querySelector(".modal-close"),
+    prevBtn: document.querySelector(".modal-prev"),
+    nextBtn: document.querySelector(".modal-next")
+  };
 
-  if (!grid) return;
+  let allModels = [];
+  let filteredModels = [];
+  let modalState = { model: null, index: 0 };
 
-  function renderModels(models) {
-    grid.innerHTML = '';
-    models.forEach(model => {
-      const card = document.createElement('article');
-      card.className = 'moto-card';
+  function parsePrice(value) {
+    if (!value) return 0;
+    return Number(String(value).replace(/[^0-9.]/g, "")) || 0;
+  }
 
-  const front = model.images.find(i => i.toLowerCase().includes('front')) || model.images[0];
-      const img = document.createElement('img');
-      img.src = `${model.folder}/${front}`;
-      img.alt = `${model.name} front`;
+  function openMenu() {
+    if (!ui.menuOverlay) return;
+    ui.menuOverlay.setAttribute("aria-hidden", "false");
+    ui.menuToggle?.setAttribute("aria-expanded", "true");
+    document.body.style.overflow = "hidden";
+  }
 
-      const body = document.createElement('div');
-      body.className = 'card-body';
-      body.innerHTML = `
-        <div class="model-name">${model.name}</div>
-        <div class="model-desc">${model.desc}</div>
-        <div class="model-price">${model.price}</div>
-        <div class="card-actions">
-          <button class="btn view-btn" data-model="${model.id}">View gallery</button>
-        </div>
-      `;
-
-      // expose model id and front image on the card for convenient click handling
-      card.dataset.model = model.id;
-      card.dataset.front = front;
-      // Make the card keyboard-focusable and announceable as a control
-      card.tabIndex = 0;
-      card.setAttribute('role', 'button');
-      card.setAttribute('aria-label', `Open gallery for ${model.name}`);
-
-      // keyboard: open on Enter or Space
-      card.addEventListener('keydown', (ev) => {
-        // Ignore key events that originate from interactive elements inside the card
-        if (ev.target && ev.target.closest && ev.target.closest('a, button')) return;
-        if (ev.key === 'Enter' || ev.key === ' ') {
-          ev.preventDefault();
-          const id = card.dataset.model;
-          const modelEntry = models.find(m => m.id === id);
-          let startIndex = 0;
-          if (modelEntry) {
-            const frontName = card.dataset.front;
-            const idx = modelEntry.images.indexOf(frontName);
-            startIndex = idx >= 0 ? idx : 0;
-          }
-          openModal(id, startIndex);
-        }
-      });
-      card.appendChild(img);
-      card.appendChild(body);
-      grid.appendChild(card);
-    });
-
-    // modal state
-    let currentModel = null;
-    let currentIndex = 0;
-
-    function openModal(modelId, index = 0) {
-      const model = models.find(m => m.id === modelId);
-      if (!model) return;
-      currentModel = model;
-      currentIndex = index;
-      const imgPath = `${model.folder}/${model.images[currentIndex]}`;
-      modalImage.src = imgPath;
-      modalImage.alt = `${model.name} image ${currentIndex+1}`;
-      modalName.textContent = model.name;
-      modalDesc.textContent = model.desc;
-      modalPrice.textContent = model.price;
-      // update modal 'Show more' link to the model's page
-      const modalShowMore = document.getElementById('modal-show-more');
-      if (modalShowMore) {
-        modalShowMore.href = `${model.folder}/index.html`;
-        modalShowMore.setAttribute('aria-label', `Open details for ${model.name}`);
-      }
-        // render specs into modal (if provided)
-        const modalInfo = document.getElementById('modal-info');
-        if (modalInfo) {
-          // remove existing specs list if any
-          const oldSpecs = modalInfo.querySelector('.modal-specs');
-          if (oldSpecs) oldSpecs.remove();
-          if (model.specs && typeof model.specs === 'object') {
-            const dl = document.createElement('dl');
-            dl.className = 'modal-specs';
-            // preferred order
-            const order = ['engine','power','seats','transmission','mileage'];
-            order.forEach(key => {
-              if (model.specs[key] !== undefined) {
-                const dt = document.createElement('dt');
-                dt.textContent = key.charAt(0).toUpperCase() + key.slice(1).replace(/([A-Z])/g, ' $1');
-                const dd = document.createElement('dd');
-                dd.textContent = model.specs[key];
-                dl.appendChild(dt);
-                dl.appendChild(dd);
-              }
-            });
-            modalInfo.appendChild(dl);
-          }
-        }
-      modal.setAttribute('aria-hidden', 'false');
-      document.body.style.overflow = 'hidden';
+  function closeMenu() {
+    if (!ui.menuOverlay) return;
+    ui.menuOverlay.setAttribute("aria-hidden", "true");
+    ui.menuToggle?.setAttribute("aria-expanded", "false");
+    if (ui.modal?.getAttribute("aria-hidden") !== "false") {
+      document.body.style.overflow = "";
     }
+  }
 
-    function closeModal() {
-      modal.setAttribute('aria-hidden', 'true');
-      document.body.style.overflow = '';
-      currentModel = null;
-    }
-
-    function showNext() {
-      if (!currentModel) return;
-      currentIndex = (currentIndex + 1) % currentModel.images.length;
-      modalImage.src = `${currentModel.folder}/${currentModel.images[currentIndex]}`;
-      modalImage.alt = `${currentModel.name} image ${currentIndex+1}`;
-    }
-
-    function showPrev() {
-      if (!currentModel) return;
-      currentIndex = (currentIndex - 1 + currentModel.images.length) % currentModel.images.length;
-      modalImage.src = `${currentModel.folder}/${currentModel.images[currentIndex]}`;
-      modalImage.alt = `${currentModel.name} image ${currentIndex+1}`;
-    }
-
-    // event delegation: open modal when clicking the view button or anywhere on the card
-    grid.addEventListener('click', (e) => {
-      // If the click originated from a link, allow normal navigation (do not open modal)
-      if (e.target.closest && e.target.closest('a')) return;
-
-      // if clicked the explicit view button, open starting at index 0
-      const btn = e.target.closest('.view-btn');
-      if (btn) {
-        const id = btn.getAttribute('data-model');
-        openModal(id, 0);
-        return;
-      }
-
-      // if clicked anywhere inside a card (image, body), open the gallery for that model
-      const card = e.target.closest('.moto-card');
-      if (card && card.dataset && card.dataset.model) {
-        const id = card.dataset.model;
-        // try to open at the front image if present in the model images
-        const model = models.find(m => m.id === id);
-        let startIndex = 0;
-        if (model) {
-          const frontName = card.dataset.front;
-          const idx = model.images.indexOf(frontName);
-          startIndex = idx >= 0 ? idx : 0;
-        }
-        openModal(id, startIndex);
+  function setupMenuOverlay() {
+    ui.menuToggle?.addEventListener("click", () => {
+      const isOpen = ui.menuOverlay?.getAttribute("aria-hidden") === "false";
+      if (isOpen) {
+        closeMenu();
+      } else {
+        openMenu();
       }
     });
 
-    closeBtn.addEventListener('click', closeModal);
-    nextBtn.addEventListener('click', showNext);
-    prevBtn.addEventListener('click', showPrev);
+    ui.menuClose?.addEventListener("click", closeMenu);
 
-    // keyboard nav inside modal
-    document.addEventListener('keydown', (e) => {
-      if (modal.getAttribute('aria-hidden') === 'false') {
-        if (e.key === 'ArrowRight') showNext();
-        if (e.key === 'ArrowLeft') showPrev();
-        if (e.key === 'Escape') closeModal();
-      }
+    ui.overlayLinks.forEach((link) => {
+      link.addEventListener("click", closeMenu);
     });
 
-    // click outside modal-content to close
-    modal.addEventListener('click', (e) => {
-      if (e.target === modal) closeModal();
+    ui.menuOverlay?.addEventListener("click", (event) => {
+      if (event.target === ui.menuOverlay) closeMenu();
+    });
+
+    document.addEventListener("keydown", (event) => {
+      if (event.key === "Escape" && ui.menuOverlay?.getAttribute("aria-hidden") === "false") {
+        closeMenu();
+      }
     });
   }
 
-  // Try to load data/models.json; fall back to the embedded list
-  fetch('data/models.json').then(r => {
-    if (!r.ok) throw new Error('no models.json');
-    return r.json();
-  }).then(json => {
-    renderModels(json);
-  }).catch(() => {
-    renderModels(fallbackModels);
-  });
+  function setupRevealAnimation() {
+    const revealItems = document.querySelectorAll(".reveal");
+    if (!revealItems.length) return;
 
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach((entry) => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add("visible");
+          observer.unobserve(entry.target);
+        }
+      });
+    }, { threshold: 0.08 });
+
+    revealItems.forEach((item) => observer.observe(item));
+  }
+
+  function createSpecsLine(specs) {
+    if (!specs) return "";
+    const labels = [];
+    if (specs.engine) labels.push(specs.engine);
+    if (specs.power) labels.push(specs.power);
+    if (labels.length < 2 && specs.transmission) labels.push(specs.transmission);
+    return labels.map((item) => `<span>${item}</span>`).join("");
+  }
+
+  function formatCount(value) {
+    const mod10 = value % 10;
+    const mod100 = value % 100;
+    if (mod10 === 1 && mod100 !== 11) return `${value} модель`;
+    if (mod10 >= 2 && mod10 <= 4 && !(mod100 >= 12 && mod100 <= 14)) return `${value} модели`;
+    return `${value} моделей`;
+  }
+
+  function renderGrid() {
+    if (!ui.grid) return;
+
+    if (!filteredModels.length) {
+      ui.grid.innerHTML = "";
+      if (ui.emptyState) ui.emptyState.hidden = false;
+      if (ui.resultCount) ui.resultCount.textContent = "0 моделей";
+      return;
+    }
+
+    if (ui.emptyState) ui.emptyState.hidden = true;
+
+    ui.grid.innerHTML = filteredModels.map((model) => {
+      const frontImage = model.images.find((fileName) => fileName.toLowerCase().includes("front")) || model.images[0] || "";
+      const engineLabel = model.specs?.engine || "Проверено";
+      const parts = String(model.name || "").trim().split(/\s+/);
+      const brand = parts[0] || model.name;
+      const series = parts.slice(1).join(" ");
+      const yearMap = {
+        "bmw-m1000": "2026",
+        "bmw-r": "2024",
+        diavel: "2025",
+        "diavel-bantley": "2026",
+        "diavel-lamborgini": "2026"
+      };
+      const modelYear = model.year || yearMap[model.id] || "2025";
+
+      return `
+        <article class="moto-card" data-model="${model.id}" tabindex="0" role="button" aria-label="Открыть галерею ${model.name}">
+          <div class="card-media">
+            <img src="${model.folder}/${frontImage}" alt="${model.name} preview">
+            <span class="stock-badge">В наличии</span>
+          </div>
+          <div class="card-body">
+            <div class="card-head">
+              <h4 class="model-name"><span class="model-brand">${brand}</span>${series ? ` <span class="model-series">${series}</span>` : ""}</h4>
+            </div>
+            <p class="model-desc">${model.desc}</p>
+            <div class="model-specs model-tags">${createSpecsLine(model.specs)}</div>
+            <div class="card-meta-row">
+              <div class="meta-item"><span>Год выпуска</span><strong>${modelYear}</strong></div>
+              <div class="meta-item"><span>Цена</span><strong>${model.price}</strong></div>
+            </div>
+            <div class="card-actions">
+              <div class="engine-note">${engineLabel}</div>
+              <button class="btn btn-primary view-btn card-arrow" data-model="${model.id}" aria-label="Открыть ${model.name}">↗</button>
+            </div>
+          </div>
+        </article>
+      `;
+    }).join("");
+
+    if (ui.resultCount) {
+      ui.resultCount.textContent = formatCount(filteredModels.length);
+    }
+  }
+
+  function applyFilters() {
+    const term = String(ui.searchInput?.value || "").trim().toLowerCase();
+    const sortMode = ui.sortSelect?.value || "default";
+
+    filteredModels = allModels
+      .filter((model) => {
+        if (!term) return true;
+        const text = `${model.name} ${model.desc} ${model.specs?.engine || ""} ${model.specs?.power || ""}`.toLowerCase();
+        return text.includes(term);
+      })
+      .slice();
+
+    if (sortMode === "price-asc") {
+      filteredModels.sort((a, b) => parsePrice(a.price) - parsePrice(b.price));
+    }
+
+    if (sortMode === "price-desc") {
+      filteredModels.sort((a, b) => parsePrice(b.price) - parsePrice(a.price));
+    }
+
+    renderGrid();
+  }
+
+  function closeModal() {
+    if (!ui.modal) return;
+    ui.modal.setAttribute("aria-hidden", "true");
+    modalState = { model: null, index: 0 };
+    if (ui.menuOverlay?.getAttribute("aria-hidden") !== "false") {
+      document.body.style.overflow = "";
+    }
+  }
+
+  function updateModal() {
+    const { model, index } = modalState;
+    if (!model || !ui.modalImage || !ui.modalName || !ui.modalDesc || !ui.modalPrice || !ui.modalInfo) return;
+
+    const imageName = model.images[index];
+    ui.modalImage.src = `${model.folder}/${imageName}`;
+    ui.modalImage.alt = `${model.name} image ${index + 1}`;
+    ui.modalName.textContent = model.name;
+    ui.modalDesc.textContent = model.desc;
+    ui.modalPrice.textContent = model.price;
+
+    if (ui.modalShowMore) {
+      ui.modalShowMore.href = `${model.folder}/index.html`;
+      ui.modalShowMore.setAttribute("aria-label", `Открыть детали ${model.name}`);
+    }
+
+    const oldSpecs = ui.modalInfo.querySelector(".modal-specs");
+    if (oldSpecs) oldSpecs.remove();
+
+    if (model.specs && typeof model.specs === "object") {
+      const map = {
+        engine: "Двигатель",
+        power: "Мощность",
+        seats: "Места",
+        transmission: "Коробка",
+        mileage: "Пробег"
+      };
+      const order = ["engine", "power", "seats", "transmission", "mileage"];
+      const dl = document.createElement("dl");
+      dl.className = "modal-specs";
+      order.forEach((key) => {
+        if (model.specs[key] === undefined) return;
+        const dt = document.createElement("dt");
+        const dd = document.createElement("dd");
+        dt.textContent = map[key] || key;
+        dd.textContent = model.specs[key];
+        dl.appendChild(dt);
+        dl.appendChild(dd);
+      });
+      ui.modalInfo.appendChild(dl);
+    }
+  }
+
+  function openModal(modelId, startIndex = 0) {
+    const model = allModels.find((item) => item.id === modelId);
+    if (!model || !ui.modal) return;
+
+    modalState = {
+      model,
+      index: Math.max(0, Math.min(startIndex, model.images.length - 1))
+    };
+
+    updateModal();
+    ui.modal.setAttribute("aria-hidden", "false");
+    document.body.style.overflow = "hidden";
+  }
+
+  function showNext() {
+    if (!modalState.model) return;
+    modalState.index = (modalState.index + 1) % modalState.model.images.length;
+    updateModal();
+  }
+
+  function showPrev() {
+    if (!modalState.model) return;
+    modalState.index = (modalState.index - 1 + modalState.model.images.length) % modalState.model.images.length;
+    updateModal();
+  }
+
+  function setupInventoryEvents() {
+    if (!ui.grid) return;
+
+    ui.searchInput?.addEventListener("input", applyFilters);
+    ui.sortSelect?.addEventListener("change", applyFilters);
+
+    ui.grid.addEventListener("click", (event) => {
+      const triggerButton = event.target.closest(".view-btn");
+      if (triggerButton) {
+        openModal(triggerButton.dataset.model || "");
+        return;
+      }
+
+      const card = event.target.closest(".moto-card");
+      if (card?.dataset.model) {
+        openModal(card.dataset.model);
+      }
+    });
+
+    ui.grid.addEventListener("keydown", (event) => {
+      if (event.target.closest("button, a, input, select, textarea")) return;
+      const card = event.target.closest(".moto-card");
+      if (!card || !card.dataset.model) return;
+
+      if (event.key === "Enter" || event.key === " ") {
+        event.preventDefault();
+        openModal(card.dataset.model);
+      }
+    });
+
+    ui.closeBtn?.addEventListener("click", closeModal);
+    ui.nextBtn?.addEventListener("click", showNext);
+    ui.prevBtn?.addEventListener("click", showPrev);
+
+    ui.modal?.addEventListener("click", (event) => {
+      if (event.target === ui.modal) closeModal();
+    });
+
+    document.addEventListener("keydown", (event) => {
+      if (ui.modal?.getAttribute("aria-hidden") !== "false") return;
+      if (event.key === "Escape") closeModal();
+      if (event.key === "ArrowRight") showNext();
+      if (event.key === "ArrowLeft") showPrev();
+    });
+  }
+
+  function loadModels() {
+    fetch("data/models.json")
+      .then((response) => {
+        if (!response.ok) throw new Error("Cannot load models.json");
+        return response.json();
+      })
+      .then((models) => {
+        allModels = Array.isArray(models) ? models : fallbackModels;
+      })
+      .catch(() => {
+        allModels = fallbackModels;
+      })
+      .finally(() => {
+        filteredModels = allModels.slice();
+        applyFilters();
+      });
+  }
+
+  setupMenuOverlay();
+  setupRevealAnimation();
+  setupInventoryEvents();
+  loadModels();
 })();

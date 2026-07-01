@@ -1,85 +1,175 @@
 <!DOCTYPE html>
-<html lang="en">
-    <head>
+<html lang="ru">
+<head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Prestige Motors</title>
+    <title>Prestige Motors | Deluxe Moto Gallery</title>
+    <meta name="description" content="Премиальный шаблон мотосалона в стиле luxury-gallery.">
     <link rel="stylesheet" href="styles.css">
-    </head>
+</head>
 <body>
-    <header>
-        <a class="skip-link" href="#main">Skip to content</a>
-        <div class="header-inner">
-            <h1 class="logo"><a href="/">Prestige Motors</a></h1>
+    <a class="skip-link" href="#main">Skip to content</a>
 
-            <button class="nav-toggle" aria-controls="primary-navigation" aria-expanded="false" aria-label="Open main menu">
+    <header class="topbar">
+        <div class="topbar-inner">
+            <button class="menu-toggle" aria-expanded="false" aria-controls="menu-overlay" aria-label="Открыть меню">
                 <span class="hamburger" aria-hidden="true"></span>
             </button>
-
-            <nav id="primary-navigation" class="nav" data-open="false">
-                <ul class="nav-list">
-                    <li><a href="#">Home</a></li>
-                    <li><a href="#">Park</a></li>
-                    <li><a href="#">Services</a></li>
-                    <li><a href="#">Contact</a></li>
-                </ul>
-            </nav>
+            <h1 class="logo"><a href="./index.html">Prestige Motors</a></h1>
+            <div class="topbar-actions">
+                <a class="header-phone" href="tel:+10001234567">+1 000 123 45 67</a>
+                <a class="btn btn-header" href="#contacts">Заявка</a>
+            </div>
         </div>
     </header>
+
+    <aside id="menu-overlay" class="menu-overlay" aria-hidden="true">
+        <div class="menu-overlay-inner">
+            <div class="menu-left">
+                <button class="menu-close" aria-label="Закрыть меню">×</button>
+                <nav class="overlay-nav" aria-label="Основная навигация">
+                    <a href="#hero">Главная</a>
+                    <a href="#inventory">Каталог</a>
+                    <a href="#services">Услуги</a>
+                    <a href="#about">О нас</a>
+                    <a href="#contacts">Контакты</a>
+                </nav>
+                <div class="overlay-meta">
+                    <a href="#">YouTube</a>
+                    <a href="#">Instagram</a>
+                    <a href="#">Telegram</a>
+                </div>
+            </div>
+            <div class="menu-right">
+                <img src="moto/diavel-lamborgini/face.webp" alt="Featured model">
+                <h3>Prestige x Performance</h3>
+                <a class="btn btn-overlay" href="#inventory">Смотреть</a>
+            </div>
+        </div>
+    </aside>
+
     <main id="main">
-        <section class="hero">
-            <div class="hero-inner">
-                <h2 class="hero-title">Explore premium and classic motorbikes</h2>
-                <p class="hero-sub">Discover curated, high-end motorbikes with certified inspections and white-glove delivery.</p>
-                <p class="hero-cta"><a class="btn" href="#moto-grid">Browse Inventory</a></p>
+        <section id="hero" class="hero-banner reveal">
+            <div class="hero-scrim">
+                <p class="hero-kicker">Deluxe moto gallery</p>
+                <h2>Галерея современного мотодизайна</h2>
+                <p>Актуальные модели премиального сегмента. Только проверенные мотоциклы в наличии.</p>
+                <a class="btn btn-hero" href="#inventory">Перейти в каталог ↗</a>
             </div>
         </section>
 
-        
-
-        <section class="content">
-            <h3>Inventory</h3>
-            <div id="moto-grid" class="moto-grid" aria-live="polite">
-                <!-- Moto cards will be populated by script.js -->
+        <section id="about" class="showcase reveal">
+            <div class="showcase-grid">
+                <img src="moto/bmw-r/front.jpg" alt="Showroom bike 1">
+                <img src="moto/diavel-bantley/front.webp" alt="Showroom bike 2">
+                <img src="moto/bmw-m1000/back.jpg" alt="Showroom bike 3">
             </div>
-        
-            <p>This is a simple web page with linked CSS for styling.</p>
+            <div class="brand-row">
+                <span>BMW</span>
+                <span>Ducati</span>
+                <span>Kawasaki</span>
+                <span>Honda</span>
+                <span>Yamaha</span>
+                <span>Triumph</span>
+            </div>
         </section>
 
-                <section class="community-hangar">
-                    <div class="community-inner">
-                        <h3>Community Hangar — Saturday Darts Tournament</h3>
-                        <p class="lead">Every Saturday at 19:00 we gather in the hangar for an informal darts tournament. Entry is anonymous, free, and open to everyone from the community — bring your friends, your helmet, and your game face.</p>
-                        <ul class="hangar-details">
-                            <li><strong>When:</strong> Saturdays, 19:00 local time</li>
-                            <li><strong>Where:</strong> Community Hangar (behind the showroom)</li>
-                            <li><strong>Format:</strong> Single-elimination, best of 3 legs. Bracket posted at 18:50.</li>
-                            <li><strong>Entry:</strong> Anonymous, free. Sign-up at the door or drop a message via Telegram.</li>
-                            <li><strong>Vibe:</strong> Passion, clean lines, and fair play — bring energy, not drama.</li>
-                        </ul>
-                        <p class="hangar-cta">Want to receive reminders? <a class="btn btn-outline" href="#">Join the hangar list</a></p>
-                    </div>
-                </section>
+        <section id="inventory" class="catalog reveal">
+            <div class="catalog-head">
+                <h3>Каталог</h3>
+                <p id="result-count" class="result-count" aria-live="polite"></p>
+            </div>
 
-        <!-- Gallery modal -->
-        <div id="gallery-modal" class="modal" aria-hidden="true" role="dialog" aria-label="Image gallery">
+            <form class="filters" aria-label="Фильтры каталога" onsubmit="return false;">
+                <label class="filter-field" for="search-input">
+                    <span>Поиск</span>
+                    <input id="search-input" type="search" placeholder="Марка, модель или двигатель">
+                </label>
+                <label class="filter-field" for="sort-select">
+                    <span>Сортировка</span>
+                    <select id="sort-select">
+                        <option value="default">По умолчанию</option>
+                        <option value="price-asc">Цена: по возрастанию</option>
+                        <option value="price-desc">Цена: по убыванию</option>
+                    </select>
+                </label>
+            </form>
+
+            <div id="moto-grid" class="moto-grid" aria-live="polite"></div>
+            <p id="empty-state" class="empty-state" hidden>Ничего не найдено. Попробуйте другой запрос.</p>
+        </section>
+
+        <section id="services" class="editorial reveal">
+            <img src="moto/diavel-lamborgini/panel.webp" alt="Detail photo">
+            <div class="editorial-text">
+                <h3>Покупка и сопровождение под ключ</h3>
+                <p>Подбор, инспекция, логистика и полный пакет сервисов для клиентов, которым важны скорость и прозрачность сделки.</p>
+                <a class="btn btn-outline" href="#contacts">Обсудить запрос</a>
+            </div>
+        </section>
+
+        <section class="subscribe reveal">
+            <div>
+                <h3>Подпишитесь на обновления</h3>
+                <p>Новые поступления, закрытые предложения и спеццены для подписчиков.</p>
+            </div>
+            <form class="subscribe-form" onsubmit="return false;">
+                <input type="email" placeholder="E-mail" aria-label="E-mail">
+                <button class="btn btn-subscribe" type="submit">Подписаться ↗</button>
+            </form>
+        </section>
+
+        <section id="contacts" class="contacts-block reveal">
+            <h3>Контакты</h3>
+            <p>Prestige Motors, Main Street 21</p>
+            <p>+1 (000) 123-45-67</p>
+            <p>hello@prestigemotors.com</p>
+        </section>
+
+        <div id="gallery-modal" class="modal" aria-hidden="true" role="dialog" aria-modal="true" aria-label="Image gallery">
             <button class="modal-close" aria-label="Close gallery">×</button>
-            <button class="modal-prev" aria-label="Previous image">‹</button>
+            <button class="modal-prev" aria-label="Previous image">&#8249;</button>
             <div class="modal-content">
                 <img id="modal-image" src="" alt="">
                 <div id="modal-info" class="modal-info">
                     <h4 id="modal-name"></h4>
                     <p id="modal-desc"></p>
-                    <p id="modal-price"></p>
-                    <p><a id="modal-show-more" class="btn btn-primary show-more-modal" href="#">Show more</a></p>
+                    <p id="modal-price" class="modal-price"></p>
+                    <p><a id="modal-show-more" class="btn btn-primary show-more-modal" href="#">Открыть страницу модели</a></p>
                 </div>
             </div>
-            <button class="modal-next" aria-label="Next image">›</button>
+            <button class="modal-next" aria-label="Next image">&#8250;</button>
         </div>
     </main>
-    <footer>
-        <p>&copy; 2025 Prestige Motors</p>
+
+    <footer class="site-footer">
+        <div class="footer-grid">
+            <div>
+                <h4>Prestige Motors</h4>
+                <p>Deluxe moto gallery</p>
+            </div>
+            <div>
+                <a href="#inventory">Каталог</a>
+                <a href="#services">Услуги</a>
+                <a href="#about">О нас</a>
+                <a href="#contacts">Контакты</a>
+            </div>
+            <div>
+                <a href="#">YouTube</a>
+                <a href="#">Instagram</a>
+                <a href="#">Telegram</a>
+            </div>
+            <div class="footer-note">
+                <a class="btn btn-outline" href="#contacts">Заявка</a>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>Политика конфиденциальности</p>
+            <p>Не является публичной офертой</p>
+            <p>© 2026. Designed for progress.</p>
+        </div>
     </footer>
+
     <script src="script.js" defer></script>
 </body>
 </html>
